@@ -80,7 +80,7 @@ object Compiler {
           }
 
           val unionRef = InterfaceDeclaration(
-            s"I${typeNameToString(name)}", ifaceFields, ListSet.empty[String], superInterface)
+            s"I${typeNameToString(name)}", ifaceFields, ListSet.empty[String], superInterface, purpose = None)
 
           compile(possibilities, Some(unionRef)) + UnionDeclaration(
             name,
@@ -89,7 +89,7 @@ object Compiler {
               case ScalaModel.CaseObject(nme, _) =>
                 CustomTypeRef(nme, ListSet.empty)
 
-              case ScalaModel.CaseClass(n, _, _, tpeArgs) => {
+              case ScalaModel.CaseClass(n, _, _, tpeArgs, _) => {
                 val nme = if (config.emitInterfaces) s"I${typeNameToString(n)}" else typeNameToString(n)
                 CustomTypeRef(nme, tpeArgs.map { SimpleTypeRef(_) })
               }
@@ -114,7 +114,8 @@ object Compiler {
       )
     },
     typeParams = scalaClass.typeArgs,
-    superInterface = superInterface
+    superInterface = superInterface,
+    purpose = Some(scalaClass.purpose)
   )
 
   private def buildInterfaceName(name: String)(implicit config: Config) = {
@@ -138,7 +139,8 @@ object Compiler {
         TypeScriptModel.Member(v.name, compileTypeRef(v.typeRef, false))
       },
       typeParams = scalaClass.typeArgs,
-      superInterface
+      superInterface,
+      scalaClass.purpose
     )
   }
 

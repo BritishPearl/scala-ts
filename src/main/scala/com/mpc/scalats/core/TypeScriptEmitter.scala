@@ -169,7 +169,8 @@ final class TypeScriptEmitter(val config: Config) {
     decl: InterfaceDeclaration,
     out: PrintStream): Unit = {
 
-    val InterfaceDeclaration(name, fields, typeParams, superInterface) = decl
+    val InterfaceDeclaration(name, fields, typeParams, superInterface, purpose) = decl
+
 
     out.print(s"export interface $name${typeParameters(typeParams)}")
 
@@ -177,7 +178,11 @@ final class TypeScriptEmitter(val config: Config) {
       out.print(s" extends ${iface.name}")
     }
 
-    out.println(" {")
+    if (purpose.nonEmpty) {
+      out.println(s" { // ${purpose.get}")
+    } else {
+      out.println(" {")
+    }
     
     list(fields).foreach { member =>
       out.println(s"${indent}${member.name}: ${getTypeRefString(member.typeRef)};")
@@ -204,7 +209,7 @@ final class TypeScriptEmitter(val config: Config) {
     out: PrintStream): Unit = {
 
     val ClassDeclaration(name, ClassConstructor(parameters),
-      values, typeParams, _/*superInterface*/) = decl
+      values, typeParams, _/*superInterface*/, purpose) = decl
 
     val tparams = typeParameters(typeParams)
 
@@ -224,7 +229,7 @@ final class TypeScriptEmitter(val config: Config) {
       out.print(s" implements I${name}${tparams}")
     }
 
-    out.println(" {")
+    out.println(s" { // ${purpose}")
 
     list(values).foreach { v =>
       out.print(indent)

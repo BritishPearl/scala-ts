@@ -18,7 +18,8 @@ object ScalaModel {
     name: TypeName,
     fields: ListSet[TypeMember],
     values: ListSet[TypeMember],
-    typeArgs: ListSet[String]) extends TypeDef
+    typeArgs: ListSet[String],
+    purpose: Purpose.Value) extends TypeDef
 
   case class CaseObject(
     name: TypeName,

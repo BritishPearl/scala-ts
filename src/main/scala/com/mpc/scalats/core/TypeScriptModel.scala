@@ -15,7 +15,12 @@ object TypeScriptModel {
 
   case class ArrayRef(innerType: TypeRef) extends TypeRef
 
-  case class InterfaceDeclaration(name: String, fields: ListSet[Member], typeParams: ListSet[String], superInterface: Option[InterfaceDeclaration]) extends Declaration
+  case class InterfaceDeclaration(
+    name: String,
+    fields: ListSet[Member],
+    typeParams: ListSet[String],
+    superInterface: Option[InterfaceDeclaration],
+    purpose: Option[Purpose.Value]) extends Declaration
   // TODO: Support mapping of typeParams with superInterface
 
   case class Member(name: String, typeRef: TypeRef)
@@ -25,7 +30,8 @@ object TypeScriptModel {
     constructor: ClassConstructor,
     values: ListSet[Member],
     typeParams: ListSet[String],
-    superInterface: Option[InterfaceDeclaration]
+    superInterface: Option[InterfaceDeclaration],
+    purpose: Purpose.Value
   ) extends Declaration
 
   case class SingletonDeclaration(

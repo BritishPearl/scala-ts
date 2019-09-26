@@ -119,11 +119,24 @@ final class ScalaParser(logger: Logger)(implicit mirror: Mirror) {
         member(m, typeParams)
     }.filterNot(members.contains)
 
+    val companion = caseClassType.companion
+    val purpose = if (companion =:= NoType) {
+      Purpose.Neither
+    } else {
+      val publicImplicitCompanionMethodNames = companion.decls.filter { decl =>
+        decl.isPublic && decl.isImplicit && decl.isMethod
+      }.map(_.asMethod.returnType.typeSymbol.fullName)
+      val isConsumed = publicImplicitCompanionMethodNames.exists(Set("Reads", "Format", "OFormat").map("play.api.libs.json." + _).contains)
+      val isProduced = publicImplicitCompanionMethodNames.exists(Set("Writes", "OWrites", "Format", "OFormat").map("play.api.libs.json." + _).contains)
+      Purpose.from(isConsumed, isProduced)
+    }
+
     Some(CaseClass(
       buildTypeName(caseClassType.typeSymbol),
       ListSet.empty ++ members,
       ListSet.empty ++ values,
-      ListSet.empty ++ typeParams
+      ListSet.empty ++ typeParams,
+      purpose
     ))
   }
 
